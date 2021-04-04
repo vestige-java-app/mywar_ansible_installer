@@ -1,0 +1,9 @@
+FROM centos:8
+
+RUN yum install -y openssh-server openssh-clients sudo && yum clean all
+
+RUN /usr/bin/ssh-keygen -A
+
+EXPOSE 22
+
+CMD ["/sbin/init"]

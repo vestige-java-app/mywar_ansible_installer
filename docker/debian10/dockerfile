@@ -1,0 +1,9 @@
+FROM debian:10
+
+RUN apt-get update && apt-get install -y openssh-server openssh-client python3 sudo
+
+RUN /usr/bin/ssh-keygen -A
+
+EXPOSE 22
+
+CMD ["/sbin/init"]

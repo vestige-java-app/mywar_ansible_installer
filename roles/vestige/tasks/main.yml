@@ -1,0 +1,76 @@
+---
+
+
+- include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}.yml"
+
+- name: Install vestige dependencies packages
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ vestige_packages }}"
+
+- name: import gaellalire rpm key
+  rpm_key:
+    key: https://gaellalire.fr/pubkey.asc
+    state: present
+  when: ansible_os_family == "RedHat"
+
+- name: import gaellalire apt key
+  apt_key:
+    url: https://gaellalire.fr/pubkey.asc
+    state: present
+  when: ansible_os_family == "Debian"
+
+
+- name: Add yum gaellalire repository
+  yum_repository:
+    name: gaellalire
+    description: Gael Lalire Repository
+    baseurl: https://gaellalire.fr/redhat
+    gpgcheck: yes
+    gpgkey: https://gaellalire.fr/pubkey.asc
+    protect: yes
+  when: ansible_os_family == "RedHat"
+
+- name: Add apt gaellalire repository
+  apt_repository:
+    repo: deb https://gaellalire.fr/debian testing main
+    state: present
+  when: ansible_os_family == "Debian"
+
+
+- name: Install vestige package
+  package:
+    name: "vestige-service-systemd"
+    state: present
+
+- name: "Create vestige.service.d directory"
+  file:
+    path: /etc/systemd/system/vestige.service.d
+    state: directory
+
+- name: Activate SSH
+  template:
+    src: override.conf.j2
+    dest: /etc/systemd/system/vestige.service.d/override.conf
+  register: override_task
+
+- name: Restart vestige if override.conf has changed
+  service:
+    name: vestige
+    state: restarted
+  when: override_task.changed
+
+- name: Making sure vestige has been started
+  service:
+    name: vestige
+    state: started
+
+- name: Making sure vestige will start on boot
+  service:
+    name: vestige
+    enabled: yes
+

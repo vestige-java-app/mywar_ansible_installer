@@ -1,0 +1,25 @@
+---
+
+- include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}.yml"
+
+# following tasks would be easier with a vestige ansible module
+
+- name: Check if tomcat is already installed
+  stat:
+    path: /home/vestige/.config/vestige/app/tc
+  register: tc_dir
+
+- name: Install tomcat
+  shell: 'HOME=/home/vestige /usr/share/vestige/vestigessh install gls tomcat 10.0.2 tc'
+  when: not tc_dir.stat.exists
+
+- name: Set tomcat to start on boot
+  shell: 'HOME=/home/vestige /usr/share/vestige/vestigessh auto-start tc on'
+  when: not tc_dir.stat.exists
+
+- name: Start tomcat
+  shell: 'HOME=/home/vestige /usr/share/vestige/vestigessh start tc'
+  when: not tc_dir.stat.exists

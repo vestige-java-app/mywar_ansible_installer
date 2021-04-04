@@ -1,0 +1,5 @@
+vestige_packages: 
+  - gnupg
+  - openjdk-11-jdk-headless
+
+java_home: /usr/lib/jvm/java-11-openjdk-amd64

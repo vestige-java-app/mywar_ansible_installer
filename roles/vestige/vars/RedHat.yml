@@ -1,0 +1,5 @@
+vestige_packages: 
+  - gnupg
+  - java-11-openjdk-headless
+
+java_home: /usr/lib/jvm/jre-11-openjdk

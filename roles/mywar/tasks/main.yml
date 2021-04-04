@@ -1,0 +1,15 @@
+---
+
+- include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}.yml"
+
+
+- name: Configure tomcat to deploy mywar
+  copy:
+    src: mywar.vwar
+    dest: /home/vestige/.config/vestige/app/tc/webapps/mywar.vwar
+    owner: vestige
+    group: vestige
+    
